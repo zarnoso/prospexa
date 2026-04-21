@@ -11,10 +11,13 @@ export async function GET(request: Request) {
     const res = await fetch(url);
     const html = await res.text();
 
-    // 🧠 PARSEO BÁSICO (primer nivel)
-    const nombreMatch = html.match(/Razón Social:<\/td><td[^>]*>(.*?)<\/td>/i);
-    const estadoMatch = html.match(/Estado:<\/td><td[^>]*>(.*?)<\/td>/i);
-    const actividadMatch = html.match(/Actividad Económica:<\/td><td[^>]*>(.*?)<\/td>/i);
+    // 🧠 LIMPIAR HTML (quitar saltos y espacios raros)
+    const clean = html.replace(/\n/g, "").replace(/\s+/g, " ");
+
+    // 🔍 Buscar por texto más flexible
+    const nombreMatch = clean.match(/Raz[oó]n Social.*?<td[^>]*>(.*?)<\/td>/i);
+    const estadoMatch = clean.match(/Estado.*?<td[^>]*>(.*?)<\/td>/i);
+    const actividadMatch = clean.match(/Actividad.*?<td[^>]*>(.*?)<\/td>/i);
 
     const data = {
       rut,
