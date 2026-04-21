@@ -1,24 +1,19 @@
 export async function GET() {
   try {
-    const res = await fetch(
-      `${process.env.CMF_BASE_URL}/instituciones`,
-      {
-        headers: {
-          apikey: process.env.CMF_API_KEY!,
-        },
-      }
-    );
+    const url = `${process.env.CMF_BASE_URL}/uf?apikey=${process.env.CMF_API_KEY}&formato=json`;
 
+    const res = await fetch(url);
     const data = await res.json();
 
     return Response.json({
       ok: true,
       data,
     });
-  } catch (error) {
+
+  } catch (error: any) {
     return Response.json({
       ok: false,
-      error: "Error conectando con CMF",
+      error: error.message,
     });
   }
 }
