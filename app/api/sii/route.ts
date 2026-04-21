@@ -8,27 +8,23 @@ export async function GET(request: Request) {
     }
 
     const url = `https://zeus.sii.cl/cvc/stc/stc.html?RUT=${rut}`;
-    const res = await fetch(url);
+
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+        "Accept":
+          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "es-CL,es;q=0.9",
+        "Connection": "keep-alive",
+      },
+    });
+
     const html = await res.text();
-
-    // 🧠 LIMPIAR HTML (quitar saltos y espacios raros)
-    const clean = html.replace(/\n/g, "").replace(/\s+/g, " ");
-
-    // 🔍 Buscar por texto más flexible
-    const nombreMatch = clean.match(/Raz[oó]n Social.*?<td[^>]*>(.*?)<\/td>/i);
-    const estadoMatch = clean.match(/Estado.*?<td[^>]*>(.*?)<\/td>/i);
-    const actividadMatch = clean.match(/Actividad.*?<td[^>]*>(.*?)<\/td>/i);
-
-    const data = {
-      rut,
-      nombre: nombreMatch ? nombreMatch[1].trim() : null,
-      estado: estadoMatch ? estadoMatch[1].trim() : null,
-      actividad: actividadMatch ? actividadMatch[1].trim() : null,
-    };
 
     return Response.json({
       ok: true,
-      data,
+      preview: html.substring(0, 500),
     });
 
   } catch (error: any) {
