@@ -1,6 +1,6 @@
 export async function GET() {
   try {
-    const url = `${process.env.CMF_BASE_URL}/instituciones`;
+    const url = `${process.env.CMF_BASE_URL}/bancos`;
 
     const res = await fetch(url, {
       headers: {
