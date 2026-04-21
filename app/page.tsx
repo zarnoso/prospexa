@@ -3,47 +3,96 @@
 import { useState } from "react";
 
 export default function Home() {
-  const [rut, setRut] = useState("");
-  const [result, setResult] = useState("");
+  const [empresas, setEmpresas] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const buscar = async () => {
-    try {
-      const url = `https://zeus.sii.cl/cvc/stc/stc.html?RUT=${rut}`;
-
-      const res = await fetch(url);
-      const html = await res.text();
-
-      setResult(html.substring(0, 500));
-    } catch (error) {
-      setResult("Error al hacer fetch");
-    }
+    setLoading(true);
+    const res = await fetch("/api/empresas");
+    const data = await res.json();
+    setEmpresas(data.data);
+    setLoading(false);
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Buscar empresa SII</h1>
+    <div style={{ fontFamily: "Arial, sans-serif" }}>
+      
+      {/* HEADER estilo mapadata */}
+      <div style={{
+        background: "#0f172a",
+        color: "white",
+        padding: "20px"
+      }}>
+        <h1 style={{ margin: 0 }}>Prospexa</h1>
+        <p style={{ margin: 0, opacity: 0.7 }}>
+          Inteligencia comercial B2B
+        </p>
+      </div>
 
-      <input
-        value={rut}
-        onChange={(e) => setRut(e.target.value)}
-        placeholder="RUT sin puntos"
-        style={{ border: "1px solid black", padding: 5 }}
-      />
+      {/* CONTENIDO */}
+      <div style={{ padding: 20 }}>
 
-      <button
-        onClick={buscar}
-        style={{
-          marginLeft: 10,
-          padding: "5px 10px",
-          background: "black",
-          color: "white",
-          cursor: "pointer",
-        }}
-      >
-        Buscar
-      </button>
+        <h2>Buscar empresas</h2>
 
-      <pre style={{ marginTop: 20 }}>{result}</pre>
+        <button
+          onClick={buscar}
+          style={{
+            padding: "10px 20px",
+            background: "#2563eb",
+            color: "white",
+            border: "none",
+            borderRadius: 6,
+            cursor: "pointer"
+          }}
+        >
+          {loading ? "Buscando..." : "Buscar empresas"}
+        </button>
+
+        {/* RESULTADOS */}
+        <div style={{ marginTop: 20 }}>
+          {empresas.map((e, i) => (
+            <div
+              key={i}
+              style={{
+                border: "1px solid #e5e7eb",
+                padding: 15,
+                borderRadius: 10,
+                marginBottom: 15,
+                boxShadow: "0 2px 6px rgba(0,0,0,0.05)"
+              }}
+            >
+              <h3 style={{ margin: 0 }}>{e.nombre}</h3>
+
+              <p style={{ margin: "5px 0" }}>
+                <strong>RUT:</strong> {e.rut}
+              </p>
+
+              <p style={{ margin: "5px 0" }}>
+                <strong>Giro:</strong> {e.giro}
+              </p>
+
+              <p style={{ margin: "5px 0" }}>
+                <strong>Región:</strong> {e.region}
+              </p>
+
+              <button
+                style={{
+                  marginTop: 10,
+                  padding: "6px 12px",
+                  background: "#10b981",
+                  color: "white",
+                  border: "none",
+                  borderRadius: 6,
+                  cursor: "pointer"
+                }}
+              >
+                Ver contactos
+              </button>
+            </div>
+          ))}
+        </div>
+
+      </div>
     </div>
   );
 }
