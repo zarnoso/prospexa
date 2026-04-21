@@ -1,13 +1,17 @@
 export async function GET() {
   try {
-    const url = `${process.env.CMF_BASE_URL}/uf?apikey=${process.env.CMF_API_KEY}&formato=json`;
+    const year = 2024;
+    const month = 1;
+
+    const url = `${process.env.CMF_BASE_URL}/uf/${year}/${month}?apikey=${process.env.CMF_API_KEY}&formato=json`;
 
     const res = await fetch(url);
-    const data = await res.json();
+    const text = await res.text();
 
     return Response.json({
-      ok: true,
-      data,
+      ok: res.ok,
+      url,
+      response: text,
     });
 
   } catch (error: any) {
