@@ -1,41 +1,56 @@
-export async function GET(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const rut = searchParams.get("rut");
+"use client";
 
-    if (!rut) {
-      return Response.json({
-        ok: false,
-        error: "Falta el parámetro rut",
-      });
-    }
+import { useState } from "react";
 
-    // 🔹 MOCK DATA (luego aquí conectamos CMF real)
-    const contactos = [
-      {
-        nombre: "Juan",
-        apellido: "Pérez",
-        cargo: "Gerente General",
-        empresaRut: rut,
-      },
-      {
-        nombre: "María",
-        apellido: "González",
-        cargo: "Directora Comercial",
-        empresaRut: rut,
-      },
-    ];
+export default function Home() {
+  const [empresas, setEmpresas] = useState<any[]>([]);
+  const [contactos, setContactos] = useState<any[]>([]);
+  const [empresaSeleccionada, setEmpresaSeleccionada] = useState<string | null>(null);
 
-    return Response.json({
-      ok: true,
-      total: contactos.length,
-      data: contactos,
-    });
+  const buscar = async () => {
+    const res = await fetch("/api/empresas");
+    const data = await res.json();
+    setEmpresas(data.data);
+  };
 
-  } catch (error: any) {
-    return Response.json({
-      ok: false,
-      error: error.message,
-    });
-  }
+  const verContactos = async (rut: string) => {
+    const res = await fetch(`/api/contactos?rut=${rut}`);
+    const data = await res.json();
+
+    setEmpresaSeleccionada(rut);
+    setContactos(data.data);
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <h1>Prospexa</h1>
+
+      <button onClick={buscar}>Buscar empresas</button>
+
+      <div style={{ marginTop: 20 }}>
+        {empresas.map((e, i) => (
+          <div key={i} style={{ border: "1px solid #ccc", padding: 10, marginBottom: 10 }}>
+            <h3>{e.nombre}</h3>
+            <p>RUT: {e.rut}</p>
+
+            <button onClick={() => verContactos(e.rut)}>
+              Ver contactos
+            </button>
+
+            {empresaSeleccionada === e.rut && (
+              <div style={{ marginTop: 10 }}>
+                <h4>Contactos:</h4>
+
+                {contactos.map((c, i) => (
+                  <div key={i}>
+                    {c.nombre} {c.apellido} — {c.cargo}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
